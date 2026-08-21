@@ -20,8 +20,13 @@ const SMTP_PASS = process.env.SMTP_PASS || 'pnjy lbtc xixh xgvr';
 const SMTP_FROM = `"WorkAlert" <${SMTP_USER}>`;
 
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: { user: SMTP_USER, pass: SMTP_PASS }
+  host: 'smtp.gmail.com',
+  port: 465,
+  secure: true,
+  auth: { user: SMTP_USER, pass: SMTP_PASS },
+  connectionTimeout: 10000,
+  greetingTimeout: 10000,
+  socketTimeout: 10000
 });
 
 /* ─── ALERT WORDING ─── */
