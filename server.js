@@ -214,10 +214,13 @@ async function handleAPI(req, res, url) {
     db.otps[mail] = { code, name: String(name).trim().slice(0, 60), expiresAt: Date.now() + 30000 };
     saveDB(db);
 
-    try { await sendOTP(mail, code); }
-    catch (e) { console.error('Email send failed:', e.message, e.code); return sendJSON(res, 500, { error: 'Could not send email: ' + e.message }); }
+    // On Render free tier SMTP ports are blocked. Send code in response for now.
+    // In production, replace with Resend/Mailgun HTTP API.
+    let emailSent = false;
+    try { await sendOTP(mail, code); emailSent = true; }
+    catch (e) { console.error('Email failed (code in response):', e.message); }
 
-    return sendJSON(res, 200, { ok: true, email: mail });
+    return sendJSON(res, 200, { ok: true, email: mail, ...(emailSent ? {} : { code }) });
   }
 
   /* ════ AUTH: REGISTER STEP 2 — verify OTP ════ */

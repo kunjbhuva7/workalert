@@ -199,13 +199,21 @@ $('signupForm').addEventListener('submit', async e => {
 
   const btn = $('regBtn'); setLoading(btn, true, 'Sending…');
   try {
-    await api('POST', '/api/auth/send-otp', { name, email });
+    const res = await api('POST', '/api/auth/send-otp', { name, email });
     otpEmail = email;
     $('otpEmailLabel').textContent = email;
     nav('sc-otp');
     startOtpTimer();
     focusOtp(0);
-    toast('Code sent to ' + email, 'info');
+    // If server returned code (email service unavailable), auto-fill it
+    if (res.code) {
+      const digits = String(res.code).split('');
+      otpBoxes.forEach((b, i) => { b.value = digits[i] || ''; });
+      updateOtpFilled();
+      toast('Code auto-filled (email unavailable)', 'info');
+    } else {
+      toast('Code sent to ' + email, 'info');
+    }
   } catch (err) {
     flagInput('regEmail', true); setHint('regHint', err.message, true); toast(err.message, 'err');
   } finally { setLoading(btn, false); }
