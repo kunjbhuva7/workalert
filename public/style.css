@@ -1116,3 +1116,123 @@ a { color: inherit; text-decoration: none; }
 .divider::before, .divider::after {
   content: ''; flex: 1; height: 1px; background: var(--line);
 }
+
+
+/* ============ OTP BOXES ============ */
+.otp-boxes {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin: var(--s5) 0 var(--s3);
+}
+.otp-box {
+  width: 60px; height: 68px;
+  border-radius: 14px;
+  border: 2px solid var(--line);
+  background: var(--surface-2);
+  font-size: 28px;
+  font-weight: 800;
+  text-align: center;
+  color: var(--ink);
+  caret-color: #EE6C1F;
+  transition: border-color .2s, box-shadow .2s;
+}
+.otp-box:focus {
+  border-color: #EE6C1F;
+  box-shadow: 0 0 0 4px rgba(238,108,31,.14);
+  outline: none;
+}
+.otp-box.filled { border-color: var(--brand-500); background: var(--brand-50); }
+
+.otp-resend {
+  text-align: center;
+  padding-top: var(--s4);
+  font-size: 14px;
+  color: var(--ink-3);
+}
+.otp-resend button {
+  color: #EE6C1F;
+  font-weight: 700;
+  font-size: 14px;
+  margin-top: 6px;
+}
+.otp-resend button:active { opacity: .5; }
+
+.sheet-sub {
+  font-size: 14px;
+  color: var(--ink-3);
+  line-height: 1.5;
+  margin-bottom: var(--s4);
+  text-align: center;
+}
+.sheet-sub strong { color: var(--ink-2); font-weight: 600; }
+
+/* ============ INVITE MODAL ============ */
+#inviteModal {
+  position: fixed;
+  inset: 0;
+  z-index: 9600;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: var(--s6);
+  background: rgba(8,10,18,.72);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+#inviteModal.show { display: flex; animation: fadeIn .28s ease; }
+
+/* ============ INVITE BUTTON in members list ============ */
+.invite-btn {
+  height: 34px;
+  padding: 0 14px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--brand-600);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all .15s;
+}
+.invite-btn:active { transform: scale(.94); }
+.invite-btn:disabled { opacity: .5; }
+.invite-btn svg { width: 14px; height: 14px; }
+
+.invite-sent {
+  height: 34px;
+  padding: 0 14px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--success-100);
+  color: var(--success-600);
+  border: none;
+  flex-shrink: 0;
+}
+.invite-sent svg { width: 14px; height: 14px; }
+
+/* Loading dot animation for 3s loader */
+.loader-3 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: var(--s5) 0;
+}
+.loader-3 i {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: #EE6C1F;
+  animation: dotPulse .8s ease-in-out infinite;
+}
+.loader-3 i:nth-child(2) { animation-delay: .15s; }
+.loader-3 i:nth-child(3) { animation-delay: .3s; }
+@keyframes dotPulse { 0%,100% { transform: scale(.6); opacity:.4; } 50% { transform: scale(1); opacity:1; } }

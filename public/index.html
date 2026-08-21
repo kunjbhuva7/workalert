@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="WorkAlert">
 <meta name="mobile-web-app-capable" content="yes">
-<title>WorkAlert — Instant Team Alerts</title>
+<title>WorkAlert</title>
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="icon" href="/icon-192.png">
 <link rel="apple-touch-icon" href="/icon-192.png">
@@ -15,26 +15,23 @@
 </head>
 <body>
 
-<!-- ═══════════ ICON SPRITE ═══════════ -->
+<!-- ICONS -->
 <svg style="display:none" xmlns="http://www.w3.org/2000/svg">
   <symbol id="i-bell" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></symbol>
   <symbol id="i-bell-ring" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/><path d="M2 8c0-3.3 2.7-6 6-6"/><path d="M22 8c0-3.3-2.7-6-6-6"/></symbol>
   <symbol id="i-mail" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></symbol>
   <symbol id="i-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></symbol>
   <symbol id="i-user" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>
-  <symbol id="i-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></symbol>
-  <symbol id="i-eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.53 13.53 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/></symbol>
-  <symbol id="i-users" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
   <symbol id="i-user-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" x2="19" y1="8" y2="14"/><line x1="22" x2="16" y1="11" y2="11"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
   <symbol id="i-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></symbol>
   <symbol id="i-arrow-left" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></symbol>
   <symbol id="i-arrow-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></symbol>
   <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></symbol>
   <symbol id="i-check-circle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></symbol>
   <symbol id="i-alert" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></symbol>
-  <symbol id="i-siren" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 18v-6a5 5 0 1 1 10 0v6"/><path d="M5 21a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-1a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v1z"/><path d="M21 12h1"/><path d="M18.5 4.5 18 5"/><path d="M2 12h1"/><path d="M12 2v1"/><path d="m4.929 4.929.707.707"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
   <symbol id="i-key" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15.5 7.5 2.3 2.3a1 1 0 0 0 1.4 0l2.1-2.1a1 1 0 0 0 0-1.4L19 4"/><path d="m21 2-9.6 9.6"/><circle cx="7.5" cy="15.5" r="5.5"/></symbol>
-  <symbol id="i-qr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M21 21v.01"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/><path d="M3 12h.01"/><path d="M12 3h.01"/><path d="M12 16v.01"/><path d="M16 12h1"/><path d="M21 12v.01"/><path d="M12 21v-1"/></symbol>
   <symbol id="i-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></symbol>
   <symbol id="i-settings" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></symbol>
   <symbol id="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></symbol>
@@ -46,82 +43,75 @@
   <symbol id="i-star" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M11.5 2.4 9.6 6.3l-4.3.6a1 1 0 0 0-.6 1.7l3.1 3-.7 4.3a1 1 0 0 0 1.5 1l3.9-2 3.8 2a1 1 0 0 0 1.5-1l-.7-4.3 3.1-3a1 1 0 0 0-.6-1.7l-4.3-.6-1.9-3.9a1 1 0 0 0-1.8 0z"/></symbol>
   <symbol id="i-file-text" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></symbol>
   <symbol id="i-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></symbol>
-  <symbol id="i-calendar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/><path d="M8 2v4"/><path d="M16 2v4"/></symbol>
+  <symbol id="i-send" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="m22 2-11 11"/></symbol>
+  <symbol id="i-refresh" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></symbol>
   <symbol id="i-zap" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/></symbol>
-  <symbol id="i-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
   <symbol id="i-vibrate" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m2 8 2 2-2 2 2 2-2 2"/><path d="m22 8-2 2 2 2-2 2 2 2"/><rect width="8" height="14" x="8" y="5" rx="1"/></symbol>
+  <symbol id="i-inbox" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></symbol>
 </svg>
 
 <div id="shell">
 
-<!-- ═══════════ SIGN IN ═══════════ -->
+<!-- ═══════ SIGN IN ═══════ -->
 <section id="sc-login" class="screen auth-screen active">
   <div class="mesh"><span class="b1"></span><span class="b2"></span><span class="b3"></span><span class="b4"></span><span class="b5"></span><span class="b6"></span></div>
-
-  <form class="sheet" id="emailForm" novalidate>
-    <div class="sheet-head">
-      <h2>Sign In</h2>
-      <button type="button" class="sheet-x" onclick="clearEmail()"><svg><use href="#i-x"/></svg></button>
-    </div>
-    <input class="sheet-input" id="authEmail" type="email" inputmode="email"
-           autocomplete="email" autocapitalize="off" spellcheck="false"
-           placeholder="hello@example.com">
-    <p class="sheet-hint" id="emailHint">Enter the email address you registered with.</p>
-    <button class="btn-next" type="submit" id="emailNext">Next</button>
-
-    <div class="sheet-foot">
-      <span>Don't have an account?</span>
-      <button type="button" onclick="goCreate()">Create Account</button>
-    </div>
+  <form class="sheet" id="loginForm" novalidate autocomplete="off">
+    <div class="sheet-head"><h2>Sign In</h2><button type="button" class="sheet-x" onclick="clearLogin()"><svg><use href="#i-x"/></svg></button></div>
+    <label class="sheet-label">Email Address</label>
+    <input class="sheet-input" id="loginEmail" type="email" inputmode="email" autocomplete="email" autocapitalize="off" spellcheck="false" placeholder="hello@example.com">
+    <p class="sheet-hint" id="loginHint">Enter the email you registered with.</p>
+    <button class="btn-next" type="submit" id="loginBtn">Next</button>
+    <div class="sheet-foot"><span>Don't have an account?</span><button type="button" onclick="nav('sc-signup')">Create Account</button></div>
   </form>
 </section>
 
-<!-- ═══════════ CREATE ACCOUNT ═══════════ -->
+<!-- ═══════ CREATE ACCOUNT — step 1: name + email ═══════ -->
 <section id="sc-signup" class="screen auth-screen">
   <div class="mesh"><span class="b1"></span><span class="b2"></span><span class="b3"></span><span class="b4"></span><span class="b5"></span><span class="b6"></span></div>
+  <form class="sheet" id="signupForm" novalidate autocomplete="off">
+    <div class="sheet-head"><h2>Create Account</h2><button type="button" class="sheet-x" onclick="nav('sc-login')"><svg><use href="#i-x"/></svg></button></div>
+    <label class="sheet-label">Your Name</label>
+    <input class="sheet-input" id="regName" type="text" autocomplete="name" autocapitalize="words" placeholder="Kunj Bhuva">
+    <label class="sheet-label mt-4">Email Address</label>
+    <input class="sheet-input" id="regEmail" type="email" inputmode="email" autocomplete="email" autocapitalize="off" spellcheck="false" placeholder="hello@example.com">
+    <p class="sheet-hint" id="regHint">We'll send a 4-digit code to verify your email.</p>
+    <button class="btn-next" type="submit" id="regBtn">Send Code</button>
+    <div class="sheet-foot"><span>Already registered?</span><button type="button" onclick="nav('sc-login')">Sign In</button></div>
+  </form>
+</section>
 
-  <form class="sheet" id="createForm2" novalidate>
-    <div class="sheet-head">
-      <h2>Create Account</h2>
-      <button type="button" class="sheet-x" onclick="nav('sc-login')"><svg><use href="#i-x"/></svg></button>
+<!-- ═══════ CREATE ACCOUNT — step 2: OTP code ═══════ -->
+<section id="sc-otp" class="screen auth-screen">
+  <div class="mesh"><span class="b1"></span><span class="b2"></span><span class="b3"></span><span class="b4"></span><span class="b5"></span><span class="b6"></span></div>
+  <form class="sheet" id="otpForm" novalidate autocomplete="off">
+    <div class="sheet-head"><h2>Enter Code</h2><button type="button" class="sheet-x" onclick="nav('sc-signup')"><svg><use href="#i-x"/></svg></button></div>
+    <p class="sheet-sub" id="otpSub">We sent a code to <strong id="otpEmailLabel"></strong></p>
+    <div class="otp-boxes" id="otpBoxes">
+      <input type="tel" maxlength="1" class="otp-box" data-idx="0" inputmode="numeric" autocomplete="one-time-code">
+      <input type="tel" maxlength="1" class="otp-box" data-idx="1" inputmode="numeric">
+      <input type="tel" maxlength="1" class="otp-box" data-idx="2" inputmode="numeric">
+      <input type="tel" maxlength="1" class="otp-box" data-idx="3" inputmode="numeric">
     </div>
-
-    <label class="sheet-label" for="regName">Your Name</label>
-    <input class="sheet-input" id="regName" type="text"
-           autocomplete="name" autocapitalize="words" placeholder="Kunj Bhuva">
-
-    <label class="sheet-label mt-4" for="regEmail">Email Address</label>
-    <input class="sheet-input" id="regEmail" type="email" inputmode="email"
-           autocomplete="email" autocapitalize="off" spellcheck="false"
-           placeholder="hello@example.com">
-
-    <p class="sheet-hint" id="regHint">Your name is what the group sees when you raise an alert.</p>
-    <button class="btn-next" type="submit" id="regNext">Create Account</button>
-
-    <div class="sheet-foot">
-      <span>Already registered?</span>
-      <button type="button" onclick="nav('sc-login')">Sign In</button>
+    <p class="sheet-hint" id="otpHint">Code expires in <span id="otpTimer">30</span>s</p>
+    <button class="btn-next" type="submit" id="otpBtn">Verify</button>
+    <div class="otp-resend hidden" id="otpResend">
+      <p>Code expired.</p>
+      <button type="button" onclick="resendOTP()" id="resendBtn">Resend Code</button>
     </div>
   </form>
 </section>
 
-<!-- ═══════════ HOME ═══════════ -->
+<!-- ═══════ HOME ═══════ -->
 <section id="sc-home" class="screen">
   <div class="topbar">
-    <div class="topbar-title">
-      <h1 id="homeGreet">Hey there</h1>
-      <p class="sub" id="homeSub">Ready when you need it</p>
-    </div>
+    <div class="topbar-title"><h1 id="homeGreet">Hey there</h1><p class="sub" id="homeSub">Ready when you need it</p></div>
     <button class="icon-btn" onclick="nav('sc-settings')"><svg><use href="#i-settings"/></svg></button>
   </div>
-
-  <div id="homeContent" style="flex:1;display:flex;flex-direction:column;padding-bottom:86px">
+  <div id="homeContent" style="flex:1;display:flex;flex-direction:column;padding:0 var(--s5) 86px">
     <div class="pill-row" id="groupPills"></div>
     <div id="groupCard"></div>
     <div class="alert-stage">
-      <div class="alert-ring"></div>
-      <div class="alert-ring"></div>
-      <div class="alert-ring"></div>
+      <div class="alert-ring"></div><div class="alert-ring"></div><div class="alert-ring"></div>
       <button class="alert-btn" id="alertBtn" onclick="triggerAlert()">
         <svg><use href="#i-bell-ring"/></svg>
         <span class="label">Alert</span>
@@ -129,17 +119,15 @@
     </div>
     <p class="alert-hint" id="alertHint">Tap to instantly notify every member</p>
   </div>
-
   <div id="homeEmpty" class="empty hidden" style="padding-bottom:100px">
     <div class="empty-art"><svg><use href="#i-users"/></svg></div>
     <h3>No groups yet</h3>
-    <p>Create a group to alert your team, or join an existing one with a 6-character code.</p>
+    <p>Create a group to alert your team, or join one with a code.</p>
     <div class="empty-actions">
       <button class="btn btn-primary" onclick="nav('sc-create')"><svg><use href="#i-plus"/></svg><span>Create a group</span></button>
       <button class="btn btn-secondary" onclick="nav('sc-join')"><svg><use href="#i-key"/></svg><span>Join with code</span></button>
     </div>
   </div>
-
   <nav class="bottom-nav">
     <button class="nav-item active" onclick="nav('sc-home')"><svg><use href="#i-home"/></svg><span>Home</span></button>
     <button class="nav-item" onclick="nav('sc-members')"><svg><use href="#i-users"/></svg><span>Members</span></button>
@@ -148,91 +136,51 @@
   </nav>
 </section>
 
-<!-- ═══════════ CREATE GROUP ═══════════ -->
+<!-- ═══════ CREATE GROUP ═══════ -->
 <section id="sc-create" class="screen">
-  <div class="topbar">
-    <button class="icon-btn" onclick="nav('sc-home')"><svg><use href="#i-arrow-left"/></svg></button>
-    <div class="topbar-title"><h1>New group</h1></div>
-  </div>
+  <div class="topbar"><button class="icon-btn" onclick="nav('sc-home')"><svg><use href="#i-arrow-left"/></svg></button><div class="topbar-title"><h1>New group</h1></div></div>
   <div class="screen-body" id="createBody">
-    <div style="text-align:center;margin-bottom:var(--s7)">
-      <div style="width:72px;height:72px;border-radius:22px;background:linear-gradient(145deg,var(--teal-500),#0891B2);display:inline-flex;align-items:center;justify-content:center;box-shadow:0 10px 28px rgba(20,184,166,.3);color:#fff">
-        <svg style="width:32px;height:32px"><use href="#i-users"/></svg>
-      </div>
-      <h2 style="font-size:20px;font-weight:700;margin-top:var(--s4);letter-spacing:-.3px">Set up your group</h2>
-      <p style="font-size:14px;color:var(--ink-3);margin-top:6px">You'll be the admin and get a shareable code</p>
+    <div style="text-align:center;margin-bottom:var(--s6)">
+      <div style="width:72px;height:72px;border-radius:22px;background:linear-gradient(145deg,#0D9488,#06B6D4);display:inline-flex;align-items:center;justify-content:center;box-shadow:0 10px 28px rgba(13,148,136,.25);color:#fff"><svg style="width:32px;height:32px"><use href="#i-users"/></svg></div>
     </div>
     <form id="createForm" novalidate>
-      <div class="field" id="f-cn">
-        <label class="field-label">Group name</label>
-        <div class="field-wrap">
-          <svg class="lead"><use href="#i-users"/></svg>
-          <input id="cn" placeholder="Warehouse Team A" maxlength="40">
-        </div>
-      </div>
-      <div class="field">
-        <label class="field-label">Description <span style="color:var(--ink-4);font-weight:400">(optional)</span></label>
-        <div class="field-wrap">
-          <svg class="lead"><use href="#i-file-text"/></svg>
-          <input id="cd" placeholder="What is this group for?" maxlength="80">
-        </div>
-      </div>
-      <div class="card card-pad mt-4" style="background:var(--brand-50);border-color:transparent;display:flex;gap:var(--s3)">
-        <svg style="width:18px;height:18px;color:var(--brand-600);flex-shrink:0;margin-top:1px"><use href="#i-info"/></svg>
-        <p style="font-size:13px;color:var(--ink-2);line-height:1.5">Everyone who joins can trigger an alert. All members get a loud alarm instantly.</p>
-      </div>
-      <button type="submit" class="btn btn-primary mt-5" id="createBtn">
-        <svg><use href="#i-plus"/></svg><span>Create Group</span>
-      </button>
+      <div class="field"><label class="field-label">Group name</label><div class="field-wrap"><svg class="lead"><use href="#i-users"/></svg><input id="cn" placeholder="Warehouse Team A" maxlength="40"></div></div>
+      <div class="field"><label class="field-label">Description <span style="color:var(--ink-4)">(optional)</span></label><div class="field-wrap"><svg class="lead"><use href="#i-file-text"/></svg><input id="cd" placeholder="Quick description" maxlength="80"></div></div>
+      <button type="submit" class="btn btn-primary mt-5" id="createBtn"><svg><use href="#i-plus"/></svg><span>Create Group</span></button>
     </form>
   </div>
   <div class="screen-body hidden" id="createSuccess">
     <div class="success-panel">
       <div class="success-icon"><svg><use href="#i-check"/></svg></div>
       <h2 style="font-size:22px;font-weight:800;letter-spacing:-.4px">Group is live</h2>
-      <p style="font-size:14px;color:var(--ink-3);max-width:260px;line-height:1.5">Share this code with your team so they can join</p>
-      <div class="share-code">
-        <span class="code" id="newCode">------</span>
-        <button class="icon-btn" onclick="copyCode()"><svg><use href="#i-copy"/></svg></button>
-      </div>
+      <p style="font-size:14px;color:var(--ink-3);max-width:260px;line-height:1.5">Share this code with your team</p>
+      <div class="share-code"><span class="code" id="newCode">------</span><button class="icon-btn" onclick="copyCode()"><svg><use href="#i-copy"/></svg></button></div>
       <button class="btn btn-primary mt-5" onclick="nav('sc-home')"><svg><use href="#i-home"/></svg><span>Go to Home</span></button>
     </div>
   </div>
 </section>
 
-<!-- ═══════════ JOIN GROUP ═══════════ -->
+<!-- ═══════ JOIN GROUP ═══════ -->
 <section id="sc-join" class="screen">
-  <div class="topbar">
-    <button class="icon-btn" onclick="nav('sc-home')"><svg><use href="#i-arrow-left"/></svg></button>
-    <div class="topbar-title"><h1>Join a group</h1></div>
-  </div>
+  <div class="topbar"><button class="icon-btn" onclick="nav('sc-home')"><svg><use href="#i-arrow-left"/></svg></button><div class="topbar-title"><h1>Join a group</h1></div></div>
   <div class="screen-body">
-    <div style="text-align:center;margin-bottom:var(--s7)">
-      <div style="width:72px;height:72px;border-radius:22px;background:linear-gradient(145deg,var(--brand-500),var(--violet-600));display:inline-flex;align-items:center;justify-content:center;box-shadow:0 10px 28px rgba(91,91,214,.3);color:#fff">
-        <svg style="width:32px;height:32px"><use href="#i-key"/></svg>
-      </div>
-      <h2 style="font-size:20px;font-weight:700;margin-top:var(--s4);letter-spacing:-.3px">Enter the code</h2>
-      <p style="font-size:14px;color:var(--ink-3);margin-top:6px">Ask your group admin for the 6-character code</p>
+    <div style="text-align:center;margin-bottom:var(--s6)">
+      <div style="width:72px;height:72px;border-radius:22px;background:linear-gradient(145deg,#4F46E5,#7C3AED);display:inline-flex;align-items:center;justify-content:center;box-shadow:0 10px 28px rgba(79,70,229,.25);color:#fff"><svg style="width:32px;height:32px"><use href="#i-key"/></svg></div>
+      <p style="font-size:14px;color:var(--ink-3);margin-top:var(--s3)">Ask your group admin for the 6-character code</p>
     </div>
     <form id="joinForm" novalidate>
-      <div class="field" id="f-jc">
-        <label class="field-label">Join code</label>
-        <div class="field-wrap">
-          <input id="jc" class="code-input" placeholder="······" maxlength="6" autocapitalize="characters" autocomplete="off" spellcheck="false">
-        </div>
-      </div>
-      <button type="submit" class="btn btn-primary mt-4" id="joinBtn">
-        <span>Join Group</span><svg><use href="#i-arrow-right"/></svg>
-      </button>
+      <div class="field"><label class="field-label">Join code</label><div class="field-wrap"><input id="jc" class="code-input" placeholder="······" maxlength="6" autocapitalize="characters" autocomplete="off" spellcheck="false"></div></div>
+      <button type="submit" class="btn btn-primary mt-4" id="joinBtn"><span>Join Group</span><svg><use href="#i-arrow-right"/></svg></button>
     </form>
   </div>
 </section>
 
-<!-- ═══════════ MEMBERS ═══════════ -->
+<!-- ═══════ MEMBERS + INVITE ═══════ -->
 <section id="sc-members" class="screen">
   <div class="topbar">
     <button class="icon-btn" onclick="nav('sc-home')"><svg><use href="#i-arrow-left"/></svg></button>
     <div class="topbar-title"><h1>Members</h1><p class="sub" id="memGroupName"></p></div>
+    <button class="icon-btn" onclick="renderMembers()" title="Refresh"><svg><use href="#i-refresh"/></svg></button>
   </div>
   <div class="screen-body has-nav" id="membersBody"></div>
   <nav class="bottom-nav">
@@ -243,12 +191,9 @@
   </nav>
 </section>
 
-<!-- ═══════════ HISTORY ═══════════ -->
+<!-- ═══════ HISTORY ═══════ -->
 <section id="sc-history" class="screen">
-  <div class="topbar">
-    <button class="icon-btn" onclick="nav('sc-home')"><svg><use href="#i-arrow-left"/></svg></button>
-    <div class="topbar-title"><h1>Alert history</h1><p class="sub" id="histGroupName"></p></div>
-  </div>
+  <div class="topbar"><button class="icon-btn" onclick="nav('sc-home')"><svg><use href="#i-arrow-left"/></svg></button><div class="topbar-title"><h1>Alert history</h1><p class="sub" id="histGroupName"></p></div></div>
   <div class="screen-body has-nav" id="historyBody"></div>
   <nav class="bottom-nav">
     <button class="nav-item" onclick="nav('sc-home')"><svg><use href="#i-home"/></svg><span>Home</span></button>
@@ -258,77 +203,43 @@
   </nav>
 </section>
 
-<!-- ═══════════ SETTINGS ═══════════ -->
+<!-- ═══════ SETTINGS ═══════ -->
 <section id="sc-settings" class="screen">
-  <div class="topbar">
-    <button class="icon-btn" onclick="nav('sc-home')"><svg><use href="#i-arrow-left"/></svg></button>
-    <div class="topbar-title"><h1>Settings</h1></div>
-  </div>
+  <div class="topbar"><button class="icon-btn" onclick="nav('sc-home')"><svg><use href="#i-arrow-left"/></svg></button><div class="topbar-title"><h1>Settings</h1></div></div>
   <div class="screen-body">
     <div class="card" style="padding:var(--s5);display:flex;align-items:center;gap:var(--s4)">
       <div class="avatar avatar-brand avatar-lg" id="setAvatar">?</div>
-      <div style="min-width:0">
-        <p style="font-size:17px;font-weight:700;letter-spacing:-.2px" id="setName"></p>
-        <p style="font-size:13px;color:var(--ink-3);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" id="setEmail"></p>
-      </div>
+      <div style="min-width:0"><p style="font-size:17px;font-weight:700;letter-spacing:-.2px" id="setName"></p><p style="font-size:13px;color:var(--ink-3);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" id="setEmail"></p></div>
     </div>
-
     <p class="section-label">Appearance</p>
     <div class="card">
       <div class="row" onclick="toggleTheme()" style="cursor:pointer">
         <div class="row-icon" style="background:var(--brand-100);color:var(--brand-600)"><svg><use href="#i-moon"/></svg></div>
-        <div class="row-body">
-          <p class="row-title">Dark mode</p>
-          <p class="row-sub">Easier on the eyes at night</p>
-        </div>
+        <div class="row-body"><p class="row-title">Dark mode</p><p class="row-sub">Easier on the eyes</p></div>
         <div class="toggle" id="themeToggle"></div>
       </div>
     </div>
-
     <p class="section-label">Alerts</p>
     <div class="card">
       <div class="row" onclick="enablePush(true)" style="cursor:pointer">
         <div class="row-icon" style="background:var(--brand-100);color:var(--brand-600)"><svg><use href="#i-bell-ring"/></svg></div>
-        <div class="row-body">
-          <p class="row-title">Background alerts</p>
-          <p class="row-sub" id="pushStatus">Checking…</p>
-        </div>
+        <div class="row-body"><p class="row-title">Background alerts</p><p class="row-sub" id="pushStatus">Checking…</p></div>
         <svg style="width:18px;height:18px;color:var(--ink-4)"><use href="#i-arrow-right"/></svg>
       </div>
       <div class="row" onclick="testSound()" style="cursor:pointer">
         <div class="row-icon" style="background:var(--danger-100);color:var(--danger-500)"><svg><use href="#i-volume"/></svg></div>
-        <div class="row-body">
-          <p class="row-title">Test alarm</p>
-          <p class="row-sub">Chime plus a 9s full-phone shake</p>
-        </div>
-        <svg style="width:18px;height:18px;color:var(--ink-4)"><use href="#i-arrow-right"/></svg>
-      </div>
-      <div class="row" onclick="testNotification()" style="cursor:pointer">
-        <div class="row-icon" style="background:var(--warn-100);color:var(--warn-500)"><svg><use href="#i-vibrate"/></svg></div>
-        <div class="row-body">
-          <p class="row-title">Test background alert</p>
-          <p class="row-sub">Shows the notification you'll receive</p>
-        </div>
+        <div class="row-body"><p class="row-title">Test alarm</p><p class="row-sub">Chime + full-phone shake</p></div>
         <svg style="width:18px;height:18px;color:var(--ink-4)"><use href="#i-arrow-right"/></svg>
       </div>
       <div class="row">
         <div class="row-icon" style="background:var(--warn-100);color:var(--warn-500)"><svg><use href="#i-zap"/></svg></div>
-        <div class="row-body">
-          <p class="row-title">Live connection</p>
-          <p class="row-sub" id="sseStatus">Checking…</p>
-        </div>
+        <div class="row-body"><p class="row-title">Live connection</p><p class="row-sub" id="sseStatus">Checking…</p></div>
       </div>
     </div>
-
     <p class="section-label">About</p>
     <div class="card">
-      <div class="row">
-        <div class="row-icon" style="background:var(--surface-3);color:var(--ink-2)"><svg><use href="#i-info"/></svg></div>
-        <div class="row-body"><p class="row-title">Version</p></div>
-        <span class="row-value">1.0.0</span>
-      </div>
+      <div class="row"><div class="row-icon" style="background:var(--surface-3);color:var(--ink-2)"><svg><use href="#i-info"/></svg></div><div class="row-body"><p class="row-title">Version</p></div><span class="row-value">2.0.0</span></div>
     </div>
-
     <button class="btn btn-danger-outline mt-7" onclick="logout()"><svg><use href="#i-logout"/></svg><span>Sign Out</span></button>
     <div style="height:var(--s6)"></div>
   </div>
@@ -336,10 +247,10 @@
 
 </div>
 
-<!-- ═══════════ ALERT MODAL ═══════════ -->
+<!-- ═══════ ALERT MODAL ═══════ -->
 <div id="alertModal">
   <div class="alert-modal-card">
-    <div class="alert-siren"><svg><use href="#i-siren"/></svg></div>
+    <div class="alert-siren"><svg><use href="#i-bell-ring"/></svg></div>
     <h2 id="modalTitle">Jamun Is Coming ⚠️</h2>
     <p class="msg" id="modalMsg"></p>
     <p class="meta" id="modalMeta"></p>
@@ -347,7 +258,20 @@
   </div>
 </div>
 
-<!-- ═══════════ TOAST ═══════════ -->
+<!-- ═══════ INVITE POPUP ═══════ -->
+<div id="inviteModal">
+  <div class="alert-modal-card">
+    <div class="alert-siren" style="background:var(--brand-100);color:var(--brand-600)"><svg><use href="#i-user-plus"/></svg></div>
+    <h2 style="color:var(--ink)" id="invTitle">Group Invite</h2>
+    <p class="msg" id="invMsg"></p>
+    <div style="display:flex;gap:var(--s3);margin-top:var(--s5)">
+      <button class="btn btn-secondary" style="flex:1" onclick="respondInvite(false)"><svg><use href="#i-x"/></svg><span>Decline</span></button>
+      <button class="btn btn-primary" style="flex:1" onclick="respondInvite(true)"><svg><use href="#i-check"/></svg><span>Accept</span></button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
 <div id="toast"></div>
 
 <script src="/app.js"></script>
