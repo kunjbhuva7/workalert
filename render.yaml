@@ -3,7 +3,7 @@ services:
     name: workalert
     runtime: node
     plan: free
-    buildCommand: echo "No build needed"
+    buildCommand: npm install
     startCommand: node server.js
     envVars:
       - key: NODE_ENV
