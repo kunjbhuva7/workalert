@@ -19,6 +19,9 @@ const SMTP_USER = process.env.SMTP_USER || 'kunjbhuva301@gmail.com';
 const SMTP_PASS = process.env.SMTP_PASS || 'pnjy lbtc xixh xgvr';
 const SMTP_FROM = `"WorkAlert" <${SMTP_USER}>`;
 
+const dns = require('dns');
+dns.setDefaultResultOrder('ipv4first');
+
 const transporter = nodemailer.createTransport({
   host: 'smtp.gmail.com',
   port: 465,
@@ -26,7 +29,8 @@ const transporter = nodemailer.createTransport({
   auth: { user: SMTP_USER, pass: SMTP_PASS },
   connectionTimeout: 10000,
   greetingTimeout: 10000,
-  socketTimeout: 10000
+  socketTimeout: 10000,
+  tls: { rejectUnauthorized: false }
 });
 
 /* ─── ALERT WORDING ─── */
