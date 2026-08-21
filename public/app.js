@@ -17,6 +17,16 @@ function idb(mode, fn) { return new Promise((res, rej) => { const r = indexedDB.
 const kvSet = (k, v) => idb('readwrite', s => s.put(v, k)).catch(() => {});
 
 /* ─── ALARM ─── */
+const TONE_NAMES = [
+  'Classic Chime', 'Emergency Siren', 'Submarine Horn', 'Digital Beep',
+  'School Bell', 'Air Raid', 'Gentle Ping', 'Police Whoop',
+  'Ship Horn', 'Cricket Chirp'
+];
+
+function playTone(toneIdx = 0, seconds = ALARM_SECONDS) {
+  alarm.playToneByIndex(toneIdx, seconds);
+}
+
 class Alarm {
   constructor() { this.ctx = null; this.bus = null; this.nodes = []; this.keepAlive = null; }
   ctxReady() {
@@ -25,22 +35,82 @@ class Alarm {
     return this.ctx;
   }
   unlock() { const ctx = this.ctxReady(); if (!ctx || this.keepAlive) return; const buf = ctx.createBuffer(1, 1, ctx.sampleRate); const src = ctx.createBufferSource(); src.buffer = buf; src.loop = true; const g = ctx.createGain(); g.gain.value = 0; src.connect(g); g.connect(ctx.destination); try { src.start(); this.keepAlive = src; } catch (_) {} }
-  play(seconds = ALARM_SECONDS, withBuzz = true) {
+
+  playToneByIndex(idx = 0, seconds = ALARM_SECONDS) {
     const ctx = this.ctxReady(); if (!ctx) return; this.stop();
-    const t0 = ctx.currentTime + 0.02, note = 0.3, gap = 0.1, step = note + gap;
-    const count = Math.max(1, Math.round(seconds / step));
-    for (let i = 0; i < count; i++) {
-      const at = t0 + i * step, freq = i % 2 === 0 ? 988 : 740;
-      const osc = ctx.createOscillator(), g = ctx.createGain(); osc.type = 'sine'; osc.frequency.setValueAtTime(freq, at);
-      g.gain.setValueAtTime(0.0001, at); g.gain.exponentialRampToValueAtTime(0.85, at + 0.03); g.gain.setValueAtTime(0.85, at + note * 0.55); g.gain.exponentialRampToValueAtTime(0.0001, at + note);
-      osc.connect(g); g.connect(this.bus); osc.start(at); osc.stop(at + note + 0.02);
-      const top = ctx.createOscillator(), gt = ctx.createGain(); top.type = 'sine'; top.frequency.setValueAtTime(freq * 2, at);
-      gt.gain.setValueAtTime(0.0001, at); gt.gain.exponentialRampToValueAtTime(0.22, at + 0.03); gt.gain.exponentialRampToValueAtTime(0.0001, at + note * 0.8);
-      top.connect(gt); gt.connect(this.bus); top.start(at); top.stop(at + note + 0.02);
-      this.nodes.push(osc, top);
-    }
-    if (withBuzz) buzz();
+    const t0 = ctx.currentTime + 0.02;
+    const tones = [
+      /* 0 Classic Chime */  () => this._chime(ctx, t0, seconds, 988, 740, 'sine'),
+      /* 1 Emergency Siren */() => this._siren(ctx, t0, seconds, 680, 1200),
+      /* 2 Submarine Horn */ () => this._horn(ctx, t0, seconds, 120, 180),
+      /* 3 Digital Beep */   () => this._chime(ctx, t0, seconds, 1400, 1000, 'square'),
+      /* 4 School Bell */    () => this._chime(ctx, t0, seconds, 1568, 1318, 'triangle'),
+      /* 5 Air Raid */       () => this._siren(ctx, t0, seconds, 400, 900),
+      /* 6 Gentle Ping */    () => this._ping(ctx, t0, seconds, 1200),
+      /* 7 Police Whoop */   () => this._whoop(ctx, t0, seconds),
+      /* 8 Ship Horn */      () => this._horn(ctx, t0, seconds, 85, 130),
+      /* 9 Cricket Chirp */  () => this._cricket(ctx, t0, seconds),
+    ];
+    (tones[idx] || tones[0])();
+    buzz();
   }
+
+  /* Tone generators */
+  _chime(ctx, t0, sec, f1, f2, type) {
+    const note = 0.3, gap = 0.1, step = note + gap, count = Math.max(1, Math.round(sec / step));
+    for (let i = 0; i < count; i++) {
+      const at = t0 + i * step, freq = i % 2 === 0 ? f1 : f2;
+      const o = ctx.createOscillator(), g = ctx.createGain(); o.type = type; o.frequency.setValueAtTime(freq, at);
+      g.gain.setValueAtTime(0.0001, at); g.gain.exponentialRampToValueAtTime(0.8, at + 0.03); g.gain.setValueAtTime(0.8, at + note * 0.5); g.gain.exponentialRampToValueAtTime(0.0001, at + note);
+      o.connect(g); g.connect(this.bus); o.start(at); o.stop(at + note + 0.02); this.nodes.push(o);
+    }
+  }
+  _siren(ctx, t0, sec, lo, hi) {
+    const o = ctx.createOscillator(), g = ctx.createGain(); o.type = 'sawtooth';
+    const cycles = Math.ceil(sec / 0.8);
+    for (let i = 0; i < cycles; i++) {
+      const at = t0 + i * 0.8;
+      o.frequency.setValueAtTime(lo, at); o.frequency.linearRampToValueAtTime(hi, at + 0.4);
+      o.frequency.linearRampToValueAtTime(lo, at + 0.8);
+    }
+    g.gain.setValueAtTime(0.5, t0); g.gain.setValueAtTime(0.5, t0 + sec - 0.1); g.gain.linearRampToValueAtTime(0.0001, t0 + sec);
+    o.connect(g); g.connect(this.bus); o.start(t0); o.stop(t0 + sec + 0.05); this.nodes.push(o);
+  }
+  _horn(ctx, t0, sec, f1, f2) {
+    const o = ctx.createOscillator(), g = ctx.createGain(); o.type = 'sawtooth'; o.frequency.setValueAtTime(f1, t0); o.frequency.linearRampToValueAtTime(f2, t0 + 0.3);
+    g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(0.7, t0 + 0.15); g.gain.setValueAtTime(0.7, t0 + sec - 0.3); g.gain.exponentialRampToValueAtTime(0.0001, t0 + sec);
+    o.connect(g); g.connect(this.bus); o.start(t0); o.stop(t0 + sec + 0.05); this.nodes.push(o);
+  }
+  _ping(ctx, t0, sec, freq) {
+    const step = 0.6, count = Math.max(1, Math.round(sec / step));
+    for (let i = 0; i < count; i++) {
+      const at = t0 + i * step;
+      const o = ctx.createOscillator(), g = ctx.createGain(); o.type = 'sine'; o.frequency.setValueAtTime(freq, at);
+      g.gain.setValueAtTime(0.0001, at); g.gain.exponentialRampToValueAtTime(0.6, at + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, at + 0.45);
+      o.connect(g); g.connect(this.bus); o.start(at); o.stop(at + 0.5); this.nodes.push(o);
+    }
+  }
+  _whoop(ctx, t0, sec) {
+    const step = 0.5, count = Math.max(1, Math.round(sec / step));
+    for (let i = 0; i < count; i++) {
+      const at = t0 + i * step;
+      const o = ctx.createOscillator(), g = ctx.createGain(); o.type = 'sine';
+      o.frequency.setValueAtTime(400, at); o.frequency.exponentialRampToValueAtTime(1600, at + 0.25); o.frequency.exponentialRampToValueAtTime(400, at + 0.45);
+      g.gain.setValueAtTime(0.0001, at); g.gain.exponentialRampToValueAtTime(0.6, at + 0.03); g.gain.setValueAtTime(0.6, at + 0.35); g.gain.exponentialRampToValueAtTime(0.0001, at + 0.45);
+      o.connect(g); g.connect(this.bus); o.start(at); o.stop(at + 0.48); this.nodes.push(o);
+    }
+  }
+  _cricket(ctx, t0, sec) {
+    const step = 0.18, count = Math.max(1, Math.round(sec / step));
+    for (let i = 0; i < count; i++) {
+      const at = t0 + i * step;
+      const o = ctx.createOscillator(), g = ctx.createGain(); o.type = 'sine'; o.frequency.setValueAtTime(4200 + (i % 3) * 200, at);
+      g.gain.setValueAtTime(0.0001, at); g.gain.exponentialRampToValueAtTime(0.35, at + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, at + 0.08);
+      o.connect(g); g.connect(this.bus); o.start(at); o.stop(at + 0.1); this.nodes.push(o);
+    }
+  }
+
+  play(seconds = ALARM_SECONDS, withBuzz = true) { this.playToneByIndex(0, seconds); }
   stop() { this.nodes.forEach(n => { try { n.stop(); } catch (_) {} }); this.nodes = []; stopBuzz(); }
 }
 const alarm = new Alarm();
@@ -290,7 +360,7 @@ function receiveAlert(a) {
   if (!a || !a.id) return; if (seenIds.has(a.id)) return;
   seenIds.add(a.id); if (seenIds.size > 200) seenIds = new Set([...seenIds].slice(-100));
   lastTs.set(a.timestamp || Date.now()); kvSet('lastAlertTs', a.timestamp || Date.now());
-  alarm.play(ALARM_SECONDS); showSystemNotification(a);
+  alarm.playToneByIndex(a.tone || 0, ALARM_SECONDS); showSystemNotification(a);
   $('modalTitle').textContent = a.title || ALERT_TITLE;
   $('modalMsg').textContent = a.message || '';
   $('modalMeta').textContent = (a.triggeredBy || 'A member') + ' · ' + (a.groupName || '');
@@ -341,7 +411,7 @@ function renderHome() {
   if (!groups.length) { $('homeContent').classList.add('hidden'); $('homeEmpty').classList.remove('hidden'); $('homeSub').textContent = 'Get started below'; return; }
   $('homeContent').classList.remove('hidden'); $('homeEmpty').classList.add('hidden');
   $('homeSub').textContent = groups.length + (groups.length === 1 ? ' group' : ' groups') + ' · ready';
-  $('groupPills').innerHTML = groups.map(g => `<button class="pill${g.id === current?.id ? ' active' : ''}" onclick="pickGroup('${g.id}')">${g.id === current?.id ? '<svg style="width:14px;height:14px"><use href="#i-check"/></svg>' : ''}${esc(g.name)}</button>`).join('');
+  $('groupPills').innerHTML = groups.map(g => `<button class="pill${g.id === current?.id ? ' active' : ''}" onclick="pickGroup('${g.id}')">${g.id === current?.id ? '<svg style="width:14px;height:14px"><use href="#i-check"/></svg>' : '<span style="margin-right:2px">' + (g.emoji || '🔔') + '</span>'}${esc(g.name)}</button>`).join('');
   if (current) {
     const isAdmin = current.adminId === me?.id, n = current.members?.length || 0;
     $('groupCard').innerHTML = `<div class="group-card"><div class="group-card-top"><div style="min-width:0"><h3>${esc(current.name)}</h3>${current.description ? `<p class="desc">${esc(current.description)}</p>` : ''}</div>${isAdmin ? '<span class="tag tag-admin"><svg><use href="#i-star"/></svg>Admin</span>' : ''}</div><div class="group-stats"><button class="stat-chip" onclick="nav('sc-members')"><svg><use href="#i-users"/></svg>${n} member${n === 1 ? '' : 's'}</button><button class="stat-chip" onclick="nav('sc-history')"><svg><use href="#i-clock"/></svg>History</button><button class="stat-chip" onclick="nav('sc-join')"><svg><use href="#i-key"/></svg>Join</button></div></div>`;
@@ -408,8 +478,8 @@ async function renderMembers() {
     const allUsers = usersData.users || [];
     const memberIds = new Set(d.members.map(m => m.id));
     const nonMembers = allUsers.filter(u => !memberIds.has(u.id));
+    const isAdmin = current.adminId === me?.id;
 
-    // Update local state
     const idx = groups.findIndex(g => g.id === current.id);
     if (idx > -1) { groups[idx].members = d.members; current = groups[idx]; }
 
@@ -417,9 +487,39 @@ async function renderMembers() {
       <div class="code-display">
         <div><p class="lbl">Join code</p><p class="val">${esc(d.code)}</p></div>
         <div class="count-box"><p class="n">${d.members.length}</p><p class="l">Members</p></div>
-      </div>
-      <p class="section-label">Group Members</p>`;
+      </div>`;
 
+    // Admin: group settings
+    if (isAdmin) {
+      const emojis = ['🔔','🚨','⚡','🔥','💀','🎯','🫡','🏴','☠️','🆘'];
+      html += `
+        <p class="section-label">Group Settings (Admin)</p>
+        <div class="card card-pad">
+          <div style="margin-bottom:14px">
+            <label class="field-label">Group Emoji</label>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px">
+              ${emojis.map(e => `<button onclick="setGroupEmoji('${e}')" style="width:40px;height:40px;border-radius:10px;font-size:20px;border:2px solid ${current.emoji === e ? 'var(--brand-600)' : 'var(--line)'};background:${current.emoji === e ? 'var(--brand-50)' : 'var(--surface-2)'};cursor:pointer">${e}</button>`).join('')}
+            </div>
+          </div>
+          <div style="margin-bottom:14px">
+            <label class="field-label">Alert Tone</label>
+            <div style="display:flex;flex-direction:column;gap:6px;margin-top:6px">
+              ${TONE_NAMES.map((name, i) => `<button onclick="setGroupTone(${i})" style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:10px;border:2px solid ${(current.alertConfig?.tone || 0) === i ? 'var(--brand-600)' : 'var(--line)'};background:${(current.alertConfig?.tone || 0) === i ? 'var(--brand-50)' : 'var(--surface-2)'};cursor:pointer;font-size:13px;font-weight:${(current.alertConfig?.tone || 0) === i ? '700' : '500'};color:var(--ink);width:100%;text-align:left"><span style="font-size:16px">${(current.alertConfig?.tone || 0) === i ? '🔊' : '▶️'}</span>${name}</button>`).join('')}
+            </div>
+          </div>
+          <div style="margin-bottom:14px">
+            <label class="field-label">Alert Title</label>
+            <input id="adminTitle" class="sheet-input" value="${esc(current.alertConfig?.title || ALERT_TITLE)}" placeholder="Jamun Is Coming ⚠️" style="height:48px;font-size:14px;margin-top:6px">
+          </div>
+          <div>
+            <label class="field-label">Alert Message</label>
+            <input id="adminMsg" class="sheet-input" value="${esc(current.alertConfig?.message || '')}" placeholder="Custom message for receivers" style="height:48px;font-size:14px;margin-top:6px">
+          </div>
+          <button class="btn btn-primary mt-4" onclick="saveGroupSettings()"><svg><use href="#i-check"/></svg><span>Save Settings</span></button>
+        </div>`;
+    }
+
+    html += `<p class="section-label">Group Members</p>`;
     html += d.members.map(m => {
       const admin = m.id === d.adminId, you = m.id === me?.id;
       return `<div class="list-item">
@@ -429,7 +529,7 @@ async function renderMembers() {
       </div>`;
     }).join('');
 
-    // Invite section — show all registered users who are NOT in this group
+    // Invite section
     if (nonMembers.length) {
       html += `<p class="section-label" style="margin-top:var(--s7)">Invite People</p>`;
       html += nonMembers.map(u => `
@@ -440,8 +540,33 @@ async function renderMembers() {
         </div>`).join('');
     }
 
+    // Leave group (non-admin only)
+    if (!isAdmin) {
+      html += `<button class="btn btn-danger-outline mt-7" onclick="leaveGroup()"><svg><use href="#i-logout"/></svg><span>Leave Group</span></button>`;
+    }
+
     box.innerHTML = html;
   } catch (err) { box.innerHTML = emptyBlock('i-alert', 'Could not load members', err.message); }
+}
+
+async function setGroupEmoji(emoji) {
+  try { const d = await api('POST', '/api/groups/' + current.id + '/settings', { emoji }); current = d.group; const idx = groups.findIndex(g => g.id === current.id); if (idx > -1) groups[idx] = current; toast('Emoji set to ' + emoji); renderMembers(); } catch (e) { toast(e.message, 'err'); }
+}
+
+async function setGroupTone(tone) {
+  alarm.unlock(); alarm.playToneByIndex(tone, 1.5); // preview
+  try { const d = await api('POST', '/api/groups/' + current.id + '/settings', { tone }); current = d.group; const idx = groups.findIndex(g => g.id === current.id); if (idx > -1) groups[idx] = current; renderMembers(); } catch (e) { toast(e.message, 'err'); }
+}
+
+async function saveGroupSettings() {
+  const title = $('adminTitle')?.value?.trim();
+  const msg = $('adminMsg')?.value?.trim();
+  try { const d = await api('POST', '/api/groups/' + current.id + '/settings', { alertTitle: title, alertMessage: msg }); current = d.group; const idx = groups.findIndex(g => g.id === current.id); if (idx > -1) groups[idx] = current; toast('Settings saved'); } catch (e) { toast(e.message, 'err'); }
+}
+
+async function leaveGroup() {
+  if (!confirm('Leave ' + current.name + '? You will stop receiving alerts.')) return;
+  try { await api('POST', '/api/groups/' + current.id + '/leave'); groups = groups.filter(g => g.id !== current.id); current = groups[0] || null; toast('Left the group'); nav('sc-home'); } catch (e) { toast(e.message, 'err'); }
 }
 
 async function sendInvite(targetUserId, btn) {
@@ -476,7 +601,7 @@ function emptyBlock(icon, title, text) { return `<div class="empty" style="min-h
 function renderSettings() { $('setAvatar').textContent = initial(me?.name); $('setName').textContent = me?.name || ''; $('setEmail').textContent = me?.email || ''; applyThemeUI(); setLiveStatus(sse && sse.readyState === 1 ? 'Connected' : 'Connecting…'); updatePushRow(); }
 function toggleTheme() { dark = !dark; localStorage.setItem('wa_theme', dark ? 'dark' : 'light'); applyThemeUI(); }
 function applyThemeUI() { document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light'); $('themeToggle')?.classList.toggle('on', dark); document.querySelector('meta[name="theme-color"]')?.setAttribute('content', dark ? '#0A0C14' : '#4F46E5'); }
-function testSound() { alarm.unlock(); alarm.play(ALARM_SECONDS); toast('Playing alarm', 'info'); }
+function testSound() { alarm.unlock(); alarm.playToneByIndex(current?.alertConfig?.tone || 0, ALARM_SECONDS); toast('Playing tone: ' + TONE_NAMES[current?.alertConfig?.tone || 0], 'info'); }
 
 /* ─── PUSH ─── */
 async function registerSW() {

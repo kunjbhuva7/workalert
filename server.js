@@ -57,7 +57,7 @@ function sessionUser(db, token) {
   return uid ? db.users[uid] || null : null;
 }
 const publicUser = u => ({ id: u.id, name: u.name, email: u.email, groups: u.groups || [] });
-const publicGroup = g => ({ id: g.id, name: g.name, description: g.description, adminId: g.adminId, adminName: g.adminName, code: g.code, members: g.members, alertConfig: g.alertConfig, createdAt: g.createdAt });
+const publicGroup = g => ({ id: g.id, name: g.name, description: g.description, adminId: g.adminId, adminName: g.adminName, code: g.code, members: g.members, alertConfig: g.alertConfig, emoji: g.emoji || '🔔', createdAt: g.createdAt });
 
 /* ─── LIVE CONNECTIONS ─── */
 const live = new Map();
@@ -277,7 +277,7 @@ async function handleAPI(req, res, url) {
     const taken = new Set(Object.values(db.groups).map(g => g.code));
     let guard = 0; while (taken.has(code) && guard++ < 50) code = genCode();
     const id = uuid();
-    db.groups[id] = { id, name: String(name).trim().slice(0,60), description: String(description||'').trim().slice(0,140), adminId: user.id, adminName: user.name, code, members: [{ id: user.id, name: user.name, email: user.email }], alertConfig: { title: ALERT_TITLE, message: ALERT_MESSAGE }, createdAt: Date.now() };
+    db.groups[id] = { id, name: String(name).trim().slice(0,60), description: String(description||'').trim().slice(0,140), adminId: user.id, adminName: user.name, code, members: [{ id: user.id, name: user.name, email: user.email }], alertConfig: { title: ALERT_TITLE, message: ALERT_MESSAGE, tone: 0 }, emoji: '🔔', createdAt: Date.now() };
     db.users[user.id].groups = [...new Set([...(user.groups||[]), id])];
     saveDB(db);
     return sendJSON(res, 200, { group: publicGroup(db.groups[id]) });
@@ -364,6 +364,35 @@ async function handleAPI(req, res, url) {
     return sendJSON(res, 200, { members: group.members, code: group.code, adminId: group.adminId });
   }
 
+  /* ── UPDATE GROUP SETTINGS (admin only) ── */
+  if (route.match(/^\/api\/groups\/[^/]+\/settings$/) && method === 'POST') {
+    const gid = route.split('/')[3];
+    const group = db.groups[gid];
+    if (!group) return sendJSON(res, 404, { error: 'Group not found' });
+    if (group.adminId !== user.id) return sendJSON(res, 403, { error: 'Only the admin can change settings' });
+    const { emoji, alertTitle, alertMessage, tone } = await readBody(req);
+    if (emoji !== undefined) group.emoji = String(emoji).slice(0, 4);
+    if (alertTitle !== undefined) group.alertConfig.title = String(alertTitle).trim().slice(0, 60) || ALERT_TITLE;
+    if (alertMessage !== undefined) group.alertConfig.message = String(alertMessage).trim().slice(0, 200) || ALERT_MESSAGE;
+    if (tone !== undefined) group.alertConfig.tone = Math.max(0, Math.min(9, Number(tone) || 0));
+    saveDB(db);
+    return sendJSON(res, 200, { group: publicGroup(group) });
+  }
+
+  /* ── LEAVE GROUP (non-admin) ── */
+  if (route.match(/^\/api\/groups\/[^/]+\/leave$/) && method === 'POST') {
+    const gid = route.split('/')[3];
+    const group = db.groups[gid];
+    if (!group) return sendJSON(res, 404, { error: 'Group not found' });
+    if (group.adminId === user.id) return sendJSON(res, 400, { error: 'Admin cannot leave. Transfer admin first or delete the group.' });
+    if (!group.members.some(m => m.id === user.id)) return sendJSON(res, 400, { error: 'Not in this group' });
+    group.members = group.members.filter(m => m.id !== user.id);
+    db.users[user.id].groups = (user.groups || []).filter(g => g !== gid);
+    saveDB(db);
+    group.members.forEach(m => pushTo(m.id, { type: 'member_left', groupId: gid, groupName: group.name, name: user.name }));
+    return sendJSON(res, 200, { ok: true });
+  }
+
   /* ── TRIGGER ALERT ── */
   if (route === '/api/alert' && method === 'POST') {
     const { groupId } = await readBody(req);
@@ -371,7 +400,7 @@ async function handleAPI(req, res, url) {
     if (!group) return sendJSON(res, 400, { error: 'Group not found' });
     if (!group.members.some(x => x.id === user.id)) return sendJSON(res, 403, { error: 'Not a member' });
 
-    const alert = { id: uuid(), groupId: group.id, groupName: group.name, triggeredBy: user.name, triggeredById: user.id, title: ALERT_TITLE, message: group.alertConfig?.message || ALERT_MESSAGE, membersNotified: group.members.length, timestamp: Date.now() };
+    const alert = { id: uuid(), groupId: group.id, groupName: group.name, triggeredBy: user.name, triggeredById: user.id, title: group.alertConfig?.title || ALERT_TITLE, message: group.alertConfig?.message || ALERT_MESSAGE, tone: group.alertConfig?.tone || 0, membersNotified: group.members.length, timestamp: Date.now() };
     db.alerts.unshift(alert);
     if (db.alerts.length > 500) db.alerts.length = 500;
     saveDB(db);
