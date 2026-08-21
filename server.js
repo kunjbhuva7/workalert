@@ -211,7 +211,7 @@ async function handleAPI(req, res, url) {
     saveDB(db);
 
     try { await sendOTP(mail, code); }
-    catch (e) { console.error('Email send failed:', e.message); return sendJSON(res, 500, { error: 'Could not send email. Try again.' }); }
+    catch (e) { console.error('Email send failed:', e.message, e.code); return sendJSON(res, 500, { error: 'Could not send email: ' + e.message }); }
 
     return sendJSON(res, 200, { ok: true, email: mail });
   }
