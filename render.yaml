@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: workalert
+    runtime: node
+    plan: free
+    buildCommand: echo "No build needed"
+    startCommand: node server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATA_DIR
+        value: /opt/render/project/src
+    autoDeploy: true
+    healthCheckPath: /api/push/key
