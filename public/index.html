@@ -81,26 +81,6 @@
 </section>
 
 <!-- ═══════ CREATE ACCOUNT — step 2: OTP code ═══════ -->
-<section id="sc-otp" class="screen auth-screen">
-  <div class="mesh"><span class="b1"></span><span class="b2"></span><span class="b3"></span><span class="b4"></span><span class="b5"></span><span class="b6"></span></div>
-  <form class="sheet" id="otpForm" novalidate autocomplete="off">
-    <div class="sheet-head"><h2>Enter Code</h2><button type="button" class="sheet-x" onclick="nav('sc-signup')"><svg><use href="#i-x"/></svg></button></div>
-    <p class="sheet-sub" id="otpSub">We sent a code to <strong id="otpEmailLabel"></strong></p>
-    <div class="otp-boxes" id="otpBoxes">
-      <input type="tel" maxlength="1" class="otp-box" data-idx="0" inputmode="numeric" autocomplete="one-time-code">
-      <input type="tel" maxlength="1" class="otp-box" data-idx="1" inputmode="numeric">
-      <input type="tel" maxlength="1" class="otp-box" data-idx="2" inputmode="numeric">
-      <input type="tel" maxlength="1" class="otp-box" data-idx="3" inputmode="numeric">
-    </div>
-    <p class="sheet-hint" id="otpHint">Code expires in <span id="otpTimer">30</span>s</p>
-    <button class="btn-next" type="submit" id="otpBtn">Verify</button>
-    <div class="otp-resend hidden" id="otpResend">
-      <p>Code expired.</p>
-      <button type="button" onclick="resendOTP()" id="resendBtn">Resend Code</button>
-    </div>
-  </form>
-</section>
-
 <!-- ═══════ HOME ═══════ -->
 <section id="sc-home" class="screen">
   <div class="topbar">
@@ -125,7 +105,6 @@
     <p>Create a group to alert your team, or join one with a code.</p>
     <div class="empty-actions">
       <button class="btn btn-primary" onclick="nav('sc-create')"><svg><use href="#i-plus"/></svg><span>Create a group</span></button>
-      <button class="btn btn-secondary" onclick="nav('sc-join')"><svg><use href="#i-key"/></svg><span>Join with code</span></button>
     </div>
   </div>
   <nav class="bottom-nav">
@@ -161,20 +140,6 @@
 </section>
 
 <!-- ═══════ JOIN GROUP ═══════ -->
-<section id="sc-join" class="screen">
-  <div class="topbar"><button class="icon-btn" onclick="nav('sc-home')"><svg><use href="#i-arrow-left"/></svg></button><div class="topbar-title"><h1>Join a group</h1></div></div>
-  <div class="screen-body">
-    <div style="text-align:center;margin-bottom:var(--s6)">
-      <div style="width:72px;height:72px;border-radius:22px;background:linear-gradient(145deg,#4F46E5,#7C3AED);display:inline-flex;align-items:center;justify-content:center;box-shadow:0 10px 28px rgba(79,70,229,.25);color:#fff"><svg style="width:32px;height:32px"><use href="#i-key"/></svg></div>
-      <p style="font-size:14px;color:var(--ink-3);margin-top:var(--s3)">Ask your group admin for the 6-character code</p>
-    </div>
-    <form id="joinForm" novalidate>
-      <div class="field"><label class="field-label">Join code</label><div class="field-wrap"><input id="jc" class="code-input" placeholder="······" maxlength="6" autocapitalize="characters" autocomplete="off" spellcheck="false"></div></div>
-      <button type="submit" class="btn btn-primary mt-4" id="joinBtn"><span>Join Group</span><svg><use href="#i-arrow-right"/></svg></button>
-    </form>
-  </div>
-</section>
-
 <!-- ═══════ MEMBERS + INVITE ═══════ -->
 <section id="sc-members" class="screen">
   <div class="topbar">

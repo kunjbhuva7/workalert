@@ -152,7 +152,7 @@ function setHint(id, text, bad = false) { const el = $(id); if (!el) return; el.
 
 /* ─── NAVIGATION ─── */
 function nav(id) {
-  const open = ['sc-login', 'sc-signup', 'sc-otp'];
+  const open = ['sc-login', 'sc-signup'];
   if (!token && !open.includes(id)) id = 'sc-login';
   if (token && open.includes(id)) id = 'sc-home';
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -162,7 +162,6 @@ function nav(id) {
   if (id === 'sc-history') renderHistory();
   if (id === 'sc-settings') renderSettings();
   if (id === 'sc-create') resetCreate();
-  if (id === 'sc-join') { $('jc').value = ''; }
 }
 
 /* ═══════════════════════════════════════════════
@@ -188,7 +187,7 @@ $('loginForm').addEventListener('submit', async e => {
 });
 
 /* ═══════════════════════════════════════════════
-   AUTH — CREATE ACCOUNT (send OTP)
+   AUTH — CREATE ACCOUNT (instant, no OTP)
    ═══════════════════════════════════════════════ */
 $('signupForm').addEventListener('submit', async e => {
   e.preventDefault(); alarm.unlock();
@@ -197,104 +196,17 @@ $('signupForm').addEventListener('submit', async e => {
   if (name.length < 2) { flagInput('regName', true); setHint('regHint', 'Please enter your name.', true); return; }
   if (!/^\S+@\S+\.\S+$/.test(email)) { flagInput('regEmail', true); setHint('regHint', 'Enter a valid email address.', true); return; }
 
-  const btn = $('regBtn'); setLoading(btn, true, 'Sending…');
+  const btn = $('regBtn'); setLoading(btn, true, 'Creating…');
   try {
-    const res = await api('POST', '/api/auth/send-otp', { name, email });
-    otpEmail = email;
-    $('otpEmailLabel').textContent = email;
-    nav('sc-otp');
-    startOtpTimer();
-    focusOtp(0);
-    // If server returned code (email service unavailable), auto-fill it
-    if (res.code) {
-      const digits = String(res.code).split('');
-      otpBoxes.forEach((b, i) => { b.value = digits[i] || ''; });
-      updateOtpFilled();
-      toast('Code auto-filled (email unavailable)', 'info');
-    } else {
-      toast('Code sent to ' + email, 'info');
-    }
-  } catch (err) {
-    flagInput('regEmail', true); setHint('regHint', err.message, true); toast(err.message, 'err');
-  } finally { setLoading(btn, false); }
-});
-
-/* ═══════════════════════════════════════════════
-   AUTH — OTP VERIFICATION
-   ═══════════════════════════════════════════════ */
-const otpBoxes = document.querySelectorAll('.otp-box');
-otpBoxes.forEach((box, i) => {
-  box.addEventListener('input', e => {
-    const v = e.target.value.replace(/\D/g, '');
-    e.target.value = v.slice(0, 1);
-    if (v && i < 3) focusOtp(i + 1);
-    updateOtpFilled();
-  });
-  box.addEventListener('keydown', e => {
-    if (e.key === 'Backspace' && !box.value && i > 0) { focusOtp(i - 1); otpBoxes[i - 1].value = ''; }
-  });
-  box.addEventListener('paste', e => {
-    e.preventDefault();
-    const text = (e.clipboardData.getData('text') || '').replace(/\D/g, '').slice(0, 4);
-    text.split('').forEach((ch, idx) => { if (otpBoxes[idx]) otpBoxes[idx].value = ch; });
-    focusOtp(Math.min(text.length, 3));
-    updateOtpFilled();
-  });
-});
-function focusOtp(i) { otpBoxes[i]?.focus(); otpBoxes[i]?.select(); }
-function updateOtpFilled() { otpBoxes.forEach(b => b.classList.toggle('filled', !!b.value)); }
-function getOtpValue() { return [...otpBoxes].map(b => b.value).join(''); }
-function clearOtpBoxes() { otpBoxes.forEach(b => { b.value = ''; b.classList.remove('filled'); }); }
-
-function startOtpTimer() {
-  clearInterval(otpTimerId);
-  $('otpResend').classList.add('hidden');
-  $('otpHint').classList.remove('hidden');
-  let sec = 30;
-  $('otpTimer').textContent = sec;
-  otpTimerId = setInterval(() => {
-    sec--;
-    $('otpTimer').textContent = sec;
-    if (sec <= 0) {
-      clearInterval(otpTimerId);
-      $('otpHint').classList.add('hidden');
-      $('otpResend').classList.remove('hidden');
-    }
-  }, 1000);
-}
-
-async function resendOTP() {
-  const btn = $('resendBtn'); btn.disabled = true; btn.textContent = 'Sending…';
-  try {
-    await api('POST', '/api/auth/resend-otp', { email: otpEmail });
-    clearOtpBoxes(); startOtpTimer(); focusOtp(0); toast('New code sent', 'info');
-  } catch (err) { toast(err.message, 'err'); }
-  finally { btn.disabled = false; btn.textContent = 'Resend Code'; }
-}
-
-$('otpForm').addEventListener('submit', async e => {
-  e.preventDefault();
-  const code = getOtpValue();
-  if (code.length !== 4) { setHint('otpHint', 'Enter all 4 digits.', true); $('otpHint').classList.remove('hidden'); return; }
-
-  const btn = $('otpBtn'); setLoading(btn, true, 'Verifying…');
-  // Show 3s loader animation
-  btn.innerHTML = '<div class="loader-3"><i></i><i></i><i></i></div>';
-  btn.disabled = true;
-
-  await new Promise(r => setTimeout(r, 3000)); // 3 second loader
-
-  try {
-    const d = await api('POST', '/api/auth/verify-otp', { email: otpEmail, code });
-    token = d.token; me = d.user; localStorage.setItem('wa_token', token);
-    clearInterval(otpTimerId);
+    const d = await api('POST', '/api/auth/register', { name, email });
+    token = d.token; me = d.user;
+    localStorage.setItem('wa_token', token);
+    localStorage.setItem('wa_email', email);
     await boot();
     toast('Account created. Welcome!');
   } catch (err) {
-    setHint('otpHint', err.message, true); $('otpHint').classList.remove('hidden');
-    toast(err.message, 'err');
-    setLoading(btn, false);
-  }
+    flagInput('regEmail', true); setHint('regHint', err.message, true); toast(err.message, 'err');
+  } finally { setLoading(btn, false); }
 });
 
 /* ─── LOGOUT ─── */
@@ -440,7 +352,7 @@ function renderHome() {
   $('groupPills').innerHTML = groups.map(g => `<button class="pill${g.id === current?.id ? ' active' : ''}" onclick="pickGroup('${g.id}')">${g.id === current?.id ? '<svg style="width:14px;height:14px"><use href="#i-check"/></svg>' : '<span style="margin-right:2px">' + (g.emoji || '🔔') + '</span>'}${esc(g.name)}</button>`).join('');
   if (current) {
     const isAdmin = current.adminId === me?.id, n = current.members?.length || 0;
-    $('groupCard').innerHTML = `<div class="group-card"><div class="group-card-top"><div style="min-width:0"><h3>${esc(current.name)}</h3>${current.description ? `<p class="desc">${esc(current.description)}</p>` : ''}</div>${isAdmin ? '<span class="tag tag-admin"><svg><use href="#i-star"/></svg>Admin</span>' : ''}</div><div class="group-stats"><button class="stat-chip" onclick="nav('sc-members')"><svg><use href="#i-users"/></svg>${n} member${n === 1 ? '' : 's'}</button><button class="stat-chip" onclick="nav('sc-history')"><svg><use href="#i-clock"/></svg>History</button><button class="stat-chip" onclick="nav('sc-join')"><svg><use href="#i-key"/></svg>Join</button></div></div>`;
+    $('groupCard').innerHTML = `<div class="group-card"><div class="group-card-top"><div style="min-width:0"><h3>${esc(current.name)}</h3>${current.description ? `<p class="desc">${esc(current.description)}</p>` : ''}</div>${isAdmin ? '<span class="tag tag-admin"><svg><use href="#i-star"/></svg>Admin</span>' : ''}</div><div class="group-stats"><button class="stat-chip" onclick="nav('sc-members')"><svg><use href="#i-users"/></svg>${n} member${n === 1 ? '' : 's'}</button><button class="stat-chip" onclick="nav('sc-history')"><svg><use href="#i-clock"/></svg>History</button></div></div>`;
     $('alertHint').textContent = n > 1 ? `Alerts ${n - 1} other member${n === 2 ? '' : 's'} instantly` : 'Invite teammates so they get your alerts';
   }
 }
@@ -475,16 +387,7 @@ $('createForm').addEventListener('submit', async e => {
 });
 function copyCode() { navigator.clipboard?.writeText($('newCode').textContent).then(() => toast('Code copied')).catch(() => toast('Copy failed', 'err')); }
 
-/* ═══════════════════════════════════════════════
-   JOIN GROUP
-   ═══════════════════════════════════════════════ */
-$('jc').addEventListener('input', e => { e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6); });
-$('joinForm').addEventListener('submit', async e => {
-  e.preventDefault();
-  const code = $('jc').value.trim(); if (code.length !== 6) { toast('Code must be 6 characters', 'err'); return; }
-  const btn = $('joinBtn'); setLoading(btn, true, 'Joining…');
-  try { const d = await api('POST', '/api/groups/join', { code }); if (!groups.find(g => g.id === d.group.id)) groups.push(d.group); current = d.group; toast('Joined ' + d.group.name); enablePush(); setTimeout(() => nav('sc-home'), 500); } catch (err) { toast(err.message, 'err'); } finally { setLoading(btn, false); }
-});
+/* (join by code removed — invite only) */
 
 /* ═══════════════════════════════════════════════
    MEMBERS + INVITE
@@ -510,9 +413,9 @@ async function renderMembers() {
     if (idx > -1) { groups[idx].members = d.members; current = groups[idx]; }
 
     let html = `
-      <div class="code-display">
-        <div><p class="lbl">Join code</p><p class="val">${esc(d.code)}</p></div>
-        <div class="count-box"><p class="n">${d.members.length}</p><p class="l">Members</p></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:var(--s4) var(--s5);background:var(--brand-50);border-radius:var(--r-lg);margin-bottom:var(--s4)">
+        <p style="font-size:15px;font-weight:700;color:var(--ink)">${d.members.length} Member${d.members.length === 1 ? '' : 's'}</p>
+        <button class="btn btn-secondary" style="width:auto;height:36px;padding:0 14px;font-size:12px" onclick="renderMembers()"><svg style="width:14px;height:14px"><use href="#i-refresh"/></svg><span>Refresh</span></button>
       </div>`;
 
     // Admin: group settings
@@ -534,13 +437,9 @@ async function renderMembers() {
             </select>
             <button class="btn btn-secondary mt-3" style="width:auto;padding:0 20px;height:40px;font-size:13px" onclick="previewTone()"><svg style="width:16px;height:16px"><use href="#i-volume"/></svg><span>Preview</span></button>
           </div>
-          <div style="margin-bottom:14px">
+          <div>
             <label class="field-label">Alert Title</label>
             <input id="adminTitle" class="sheet-input" value="${esc(current.alertConfig?.title || ALERT_TITLE)}" placeholder="Jamun Is Coming ⚠️" style="height:48px;font-size:14px;margin-top:6px">
-          </div>
-          <div>
-            <label class="field-label">Alert Message</label>
-            <input id="adminMsg" class="sheet-input" value="${esc(current.alertConfig?.message || '')}" placeholder="Custom message for receivers" style="height:48px;font-size:14px;margin-top:6px">
           </div>
           <button class="btn btn-primary mt-4" onclick="saveGroupSettings()"><svg><use href="#i-check"/></svg><span>Save Settings</span></button>
         </div>`;
@@ -593,8 +492,7 @@ function previewTone() {
 
 async function saveGroupSettings() {
   const title = $('adminTitle')?.value?.trim();
-  const msg = $('adminMsg')?.value?.trim();
-  try { const d = await api('POST', '/api/groups/' + current.id + '/settings', { alertTitle: title, alertMessage: msg }); current = d.group; const idx = groups.findIndex(g => g.id === current.id); if (idx > -1) groups[idx] = current; toast('Settings saved'); } catch (e) { toast(e.message, 'err'); }
+  try { const d = await api('POST', '/api/groups/' + current.id + '/settings', { alertTitle: title }); current = d.group; const idx = groups.findIndex(g => g.id === current.id); if (idx > -1) groups[idx] = current; toast('Settings saved'); } catch (e) { toast(e.message, 'err'); }
 }
 
 async function leaveGroup() {

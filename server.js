@@ -200,8 +200,8 @@ async function handleAPI(req, res, url) {
     return sendJSON(res, 200, { token: tk, user: publicUser(user) });
   }
 
-  /* ════ AUTH: REGISTER STEP 1 — send OTP ════ */
-  if (route === '/api/auth/send-otp' && method === 'POST') {
+  /* ════ AUTH: REGISTER (instant, no OTP) ════ */
+  if (route === '/api/auth/register' && method === 'POST') {
     const { email, name } = await readBody(req);
     const mail = normEmail(email);
     if (!mail) return sendJSON(res, 400, { error: 'Enter a valid email address' });
@@ -209,53 +209,11 @@ async function handleAPI(req, res, url) {
     const db = loadDB();
     if (Object.values(db.users).some(u => u.email === mail))
       return sendJSON(res, 400, { error: 'This email is already registered. Go to Sign In.' });
-
-    const code = gen4();
-    db.otps[mail] = { code, name: String(name).trim().slice(0, 60), expiresAt: Date.now() + 30000 };
-    saveDB(db);
-
-    // On Render free tier SMTP ports are blocked. Send code in response for now.
-    // In production, replace with Resend/Mailgun HTTP API.
-    let emailSent = false;
-    try { await sendOTP(mail, code); emailSent = true; }
-    catch (e) { console.error('Email failed (code in response):', e.message); }
-
-    return sendJSON(res, 200, { ok: true, email: mail, ...(emailSent ? {} : { code }) });
-  }
-
-  /* ════ AUTH: REGISTER STEP 2 — verify OTP ════ */
-  if (route === '/api/auth/verify-otp' && method === 'POST') {
-    const { email, code } = await readBody(req);
-    const mail = normEmail(email);
-    if (!mail || !code) return sendJSON(res, 400, { error: 'Email and code required' });
-    const db = loadDB();
-    const otp = db.otps[mail];
-    if (!otp) return sendJSON(res, 400, { error: 'No code was sent to this email. Request a new one.' });
-    if (Date.now() > otp.expiresAt) { delete db.otps[mail]; saveDB(db); return sendJSON(res, 400, { error: 'Code expired. Tap Resend.' }); }
-    if (otp.code !== String(code).trim()) return sendJSON(res, 400, { error: 'Wrong code. Check your email.' });
-
-    // Create the user
     const id = uuid();
-    db.users[id] = { id, name: otp.name, email: mail, groups: [], createdAt: Date.now() };
-    delete db.otps[mail];
+    db.users[id] = { id, name: String(name).trim().slice(0, 60), email: mail, groups: [], createdAt: Date.now() };
     const tk = uuid(); db.sessions[tk] = id;
     saveDB(db);
     return sendJSON(res, 200, { token: tk, user: publicUser(db.users[id]) });
-  }
-
-  /* ════ AUTH: RESEND OTP ════ */
-  if (route === '/api/auth/resend-otp' && method === 'POST') {
-    const { email } = await readBody(req);
-    const mail = normEmail(email);
-    if (!mail) return sendJSON(res, 400, { error: 'Invalid email' });
-    const db = loadDB();
-    const prev = db.otps[mail];
-    if (!prev) return sendJSON(res, 400, { error: 'Start registration again' });
-    const code = gen4();
-    db.otps[mail] = { ...prev, code, expiresAt: Date.now() + 30000 };
-    saveDB(db);
-    try { await sendOTP(mail, code); } catch(e) { return sendJSON(res, 500, { error: 'Email failed' }); }
-    return sendJSON(res, 200, { ok: true });
   }
 
   /* ════ EVERYTHING BELOW NEEDS AUTH ════ */
@@ -295,20 +253,7 @@ async function handleAPI(req, res, url) {
     return sendJSON(res, 200, { group: publicGroup(db.groups[id]) });
   }
 
-  /* ── JOIN GROUP BY CODE ── */
-  if (route === '/api/groups/join' && method === 'POST') {
-    const { code } = await readBody(req);
-    if (!code) return sendJSON(res, 400, { error: 'Join code required' });
-    const wanted = String(code).toUpperCase().trim();
-    const group = Object.values(db.groups).find(g => g.code === wanted);
-    if (!group) return sendJSON(res, 400, { error: 'No group with that code' });
-    if (group.members.some(m => m.id === user.id)) return sendJSON(res, 400, { error: 'Already in this group' });
-    group.members.push({ id: user.id, name: user.name, email: user.email });
-    db.users[user.id].groups = [...new Set([...(user.groups||[]), group.id])];
-    saveDB(db);
-    group.members.filter(m => m.id !== user.id).forEach(m => pushTo(m.id, { type: 'member_joined', groupId: group.id, groupName: group.name, name: user.name }));
-    return sendJSON(res, 200, { group: publicGroup(group) });
-  }
+  /* ── (join by code removed — invite only) ── */
 
   /* ── SEND INVITE (to another registered user) ── */
   if (route === '/api/invite' && method === 'POST') {
@@ -382,10 +327,9 @@ async function handleAPI(req, res, url) {
     const group = db.groups[gid];
     if (!group) return sendJSON(res, 404, { error: 'Group not found' });
     if (group.adminId !== user.id) return sendJSON(res, 403, { error: 'Only the admin can change settings' });
-    const { emoji, alertTitle, alertMessage, tone } = await readBody(req);
+    const { emoji, alertTitle, tone } = await readBody(req);
     if (emoji !== undefined) group.emoji = String(emoji).slice(0, 4);
     if (alertTitle !== undefined) group.alertConfig.title = String(alertTitle).trim().slice(0, 60) || ALERT_TITLE;
-    if (alertMessage !== undefined) group.alertConfig.message = String(alertMessage).trim().slice(0, 200) || ALERT_MESSAGE;
     if (tone !== undefined) group.alertConfig.tone = Math.max(0, Math.min(9, Number(tone) || 0));
     saveDB(db);
     return sendJSON(res, 200, { group: publicGroup(group) });
