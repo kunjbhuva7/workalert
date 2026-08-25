@@ -1,0 +1,60 @@
+{
+  "expo": {
+    "name": "WorkAlert",
+    "slug": "workalert",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#1a1a2e"
+    },
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.workalert.app"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#1a1a2e"
+      },
+      "package": "com.workalert.app",
+      "googleServicesFile": "./google-services.json",
+      "permissions": [
+        "VIBRATE",
+        "RECEIVE_BOOT_COMPLETED",
+        "WAKE_LOCK",
+        "FOREGROUND_SERVICE"
+      ],
+      "useNextNotificationsApi": true
+    },
+    "plugins": [
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/notification-icon.png",
+          "color": "#e94560",
+          "sounds": ["./assets/alarm.wav"],
+          "defaultChannel": "workalert-alarm",
+          "enableBackgroundRemoteNotifications": true
+        }
+      ],
+      "expo-task-manager",
+      "expo-background-fetch"
+    ],
+    "notification": {
+      "icon": "./assets/notification-icon.png",
+      "color": "#e94560",
+      "androidMode": "default",
+      "androidCollapsedTitle": "WorkAlert"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "your-eas-project-id"
+      }
+    }
+  }
+}
