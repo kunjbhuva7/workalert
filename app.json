@@ -2,6 +2,7 @@
   "expo": {
     "name": "WorkAlert",
     "slug": "workalert",
+    "owner": "kbhuva",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -11,7 +12,9 @@
       "resizeMode": "contain",
       "backgroundColor": "#1a1a2e"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.workalert.app"
@@ -22,12 +25,13 @@
         "backgroundColor": "#1a1a2e"
       },
       "package": "com.workalert.app",
-      "googleServicesFile": "./google-services.json",
       "permissions": [
         "VIBRATE",
         "RECEIVE_BOOT_COMPLETED",
         "WAKE_LOCK",
-        "FOREGROUND_SERVICE"
+        "FOREGROUND_SERVICE",
+        "android.permission.RECEIVE_BOOT_COMPLETED",
+        "android.permission.WAKE_LOCK"
       ],
       "useNextNotificationsApi": true
     },
@@ -37,7 +41,9 @@
         {
           "icon": "./assets/notification-icon.png",
           "color": "#e94560",
-          "sounds": ["./assets/alarm.wav"],
+          "sounds": [
+            "./assets/alarm.wav"
+          ],
           "defaultChannel": "workalert-alarm",
           "enableBackgroundRemoteNotifications": true
         }
@@ -53,7 +59,7 @@
     },
     "extra": {
       "eas": {
-        "projectId": "your-eas-project-id"
+        "projectId": "1555cd30-4586-4f41-bd10-3084714f2a19"
       }
     }
   }

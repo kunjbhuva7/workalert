@@ -43,9 +43,7 @@ export async function setupNotifications() {
     return;
   }
 
-  const tokenData = await Notifications.getExpoPushTokenAsync({
-    projectId: 'your-eas-project-id',
-  });
+  const tokenData = await Notifications.getExpoPushTokenAsync();
 
   // Also get FCM token for direct FCM
   let fcmToken: string | undefined;
@@ -88,9 +86,7 @@ export async function registerForPushNotificationsAsync(): Promise<string | unde
     const deviceToken = await Notifications.getDevicePushTokenAsync();
     return deviceToken.data as string;
   } catch {
-    const expoToken = await Notifications.getExpoPushTokenAsync({
-      projectId: 'your-eas-project-id',
-    });
+    const expoToken = await Notifications.getExpoPushTokenAsync();
     return expoToken.data;
   }
 }
