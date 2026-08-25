@@ -309,17 +309,35 @@ async function logout() {
 }
 
 /* ═══════════════════════════════════════════════
-   BOOT
+   BOOT — handles Render DB wipe by auto re-login
    ═══════════════════════════════════════════════ */
 async function boot() {
   try {
     me = (await api('GET', '/api/me')).user;
     groups = (await api('GET', '/api/groups')).groups || [];
     current = groups[0] || null;
+    // Save email for auto re-login if server restarts
+    if (me?.email) localStorage.setItem('wa_email', me.email);
     nav('sc-home');
     kvSet('token', token); swReg?.active?.postMessage({ type: 'SET_TOKEN', token });
     waitLoop(); reviveLive(); startPolling(); enablePush(); checkInvites();
-  } catch (_) { token = null; localStorage.removeItem('wa_token'); nav('sc-login'); }
+  } catch (e) {
+    // Session expired (server restarted / DB wiped). Try auto re-login.
+    const savedEmail = localStorage.getItem('wa_email');
+    if (savedEmail) {
+      try {
+        const d = await api('POST', '/api/auth/enter', { email: savedEmail });
+        token = d.token; me = d.user;
+        localStorage.setItem('wa_token', token);
+        return boot(); // retry
+      } catch (_) {
+        // Account doesn't exist anymore (DB wiped). Clear everything.
+      }
+    }
+    token = null;
+    localStorage.removeItem('wa_token');
+    nav('sc-login');
+  }
 }
 
 /* ═══════════════════════════════════════════════
@@ -511,9 +529,10 @@ async function renderMembers() {
           </div>
           <div style="margin-bottom:14px">
             <label class="field-label">Alert Tone</label>
-            <div style="display:flex;flex-direction:column;gap:6px;margin-top:6px">
-              ${TONE_NAMES.map((name, i) => `<button onclick="setGroupTone(${i})" style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:10px;border:2px solid ${(current.alertConfig?.tone || 0) === i ? 'var(--brand-600)' : 'var(--line)'};background:${(current.alertConfig?.tone || 0) === i ? 'var(--brand-50)' : 'var(--surface-2)'};cursor:pointer;font-size:13px;font-weight:${(current.alertConfig?.tone || 0) === i ? '700' : '500'};color:var(--ink);width:100%;text-align:left"><span style="font-size:16px">${(current.alertConfig?.tone || 0) === i ? '🔊' : '▶️'}</span>${name}</button>`).join('')}
-            </div>
+            <select id="toneSelect" onchange="setGroupTone(Number(this.value))" style="width:100%;height:50px;border-radius:12px;border:2px solid var(--line);background:var(--surface-2);color:var(--ink);font-size:14px;font-weight:600;padding:0 16px;margin-top:6px;font-family:inherit;cursor:pointer;appearance:auto">
+              ${TONE_NAMES.map((name, i) => `<option value="${i}" ${(current.alertConfig?.tone || 0) === i ? 'selected' : ''}>${name}</option>`).join('')}
+            </select>
+            <button class="btn btn-secondary mt-3" style="width:auto;padding:0 20px;height:40px;font-size:13px" onclick="previewTone()"><svg style="width:16px;height:16px"><use href="#i-volume"/></svg><span>Preview</span></button>
           </div>
           <div style="margin-bottom:14px">
             <label class="field-label">Alert Title</label>
@@ -562,8 +581,14 @@ async function setGroupEmoji(emoji) {
 }
 
 async function setGroupTone(tone) {
-  alarm.unlock(); alarm.playToneByIndex(tone, 1.5); // preview
-  try { const d = await api('POST', '/api/groups/' + current.id + '/settings', { tone }); current = d.group; const idx = groups.findIndex(g => g.id === current.id); if (idx > -1) groups[idx] = current; renderMembers(); } catch (e) { toast(e.message, 'err'); }
+  try { const d = await api('POST', '/api/groups/' + current.id + '/settings', { tone }); current = d.group; const idx = groups.findIndex(g => g.id === current.id); if (idx > -1) groups[idx] = current; toast('Tone set: ' + TONE_NAMES[tone]); } catch (e) { toast(e.message, 'err'); }
+}
+
+function previewTone() {
+  const sel = $('toneSelect');
+  const idx = sel ? Number(sel.value) : 0;
+  alarm.unlock(); alarm.playToneByIndex(idx, 2);
+  toast('Playing: ' + TONE_NAMES[idx], 'info');
 }
 
 async function saveGroupSettings() {
