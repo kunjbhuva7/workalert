@@ -49,7 +49,9 @@
         }
       ],
       "expo-task-manager",
-      "expo-background-fetch"
+      "expo-background-fetch",
+      "expo-asset",
+      "expo-font"
     ],
     "notification": {
       "icon": "./assets/notification-icon.png",
