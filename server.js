@@ -13,6 +13,7 @@ const { PUBLIC_KEY, sendPush } = require('./push');
 const PORT    = Number(process.env.PORT) || 3000;
 const PUBLIC  = path.join(__dirname, 'public');
 const DB_FILE = path.join(process.env.DATA_DIR || __dirname, 'database.json');
+const USE_MYSQL = process.env.DB_TYPE === 'mysql';
 
 /* ─── SMTP ─── */
 const SMTP_USER = process.env.SMTP_USER || 'kunjbhuva301@gmail.com';
@@ -39,8 +40,20 @@ const ALERT_MESSAGE = 'Get ready — someone in your group just raised the alert
 
 /* ─── DATABASE ─── */
 const EMPTY_DB = { users: {}, groups: {}, alerts: [], sessions: {}, pushSubs: {}, otps: {}, invites: [] };
+let dbMySQL = null;
+let _dbCache = null;
+
+if (USE_MYSQL) {
+  dbMySQL = require('./db-mysql');
+  dbMySQL.initTables().then(async () => {
+    console.log('  MySQL connected');
+    _dbCache = await dbMySQL.loadDB();
+    console.log('  Cache warmed:', Object.keys(_dbCache.users).length, 'users');
+  }).catch(e => { console.error('MySQL init failed:', e.message); });
+}
 
 function loadDB() {
+  if (USE_MYSQL) return _dbCache || structuredClone(EMPTY_DB);
   try {
     if (!fs.existsSync(DB_FILE)) { fs.writeFileSync(DB_FILE, JSON.stringify(EMPTY_DB, null, 2)); return structuredClone(EMPTY_DB); }
     const raw = fs.readFileSync(DB_FILE, 'utf8').trim();
@@ -49,6 +62,7 @@ function loadDB() {
   } catch (e) { console.error('DB read error:', e.message); return structuredClone(EMPTY_DB); }
 }
 function saveDB(db) {
+  if (USE_MYSQL) { _dbCache = db; dbMySQL.saveDB(db).catch(e => console.error('MySQL save:', e.message)); return; }
   const tmp = DB_FILE + '.tmp';
   fs.writeFileSync(tmp, JSON.stringify(db, null, 2));
   fs.renameSync(tmp, DB_FILE);
